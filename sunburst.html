@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<!-- Styles -->
+<style>
+#sunburstChart {
+  height: 650px;
+}
+</style>
+
+<!-- Resources -->
+<script src="https://www.amcharts.com/lib/4/core.js"></script>
+<script src="https://www.amcharts.com/lib/4/charts.js"></script>
+<script src="https://www.amcharts.com/lib/4/plugins/sunburst.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/material.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+
+<!-- Chart code -->
+<script>
+am4core.ready(function() {
+
+// Themes begin
+am4core.useTheme(am4themes_material);
+am4core.useTheme(am4themes_animated);
+// Themes end
+
+// create chart
+var sunburstChart = am4core.create("sunburstChart", am4plugins_sunburst.Sunburst);
+sunburstChart.padding(0,0,0,0);
+sunburstChart.radius = am4core.percent(98);
+
+sunburstChart.data = [
+{
+  name: "Male",
+  children: [
+         {name: "community", value: 157000*0.77},
+         {name: "cared accommodation", value: 157000*0.23}
+     ]
+},
+{
+  name: "Female",
+  children: [
+         {name: "community", value: 242800*0.65},
+         {name: "cared accommodation", value: 242800*0.35}
+     ]
+}];
+
+sunburstChart.colors.step = 2;
+sunburstChart.fontSize = 11;
+sunburstChart.innerRadius = am4core.percent(10);
+
+// define data fields
+sunburstChart.dataFields.value = "value";
+sunburstChart.dataFields.name = "name";
+sunburstChart.dataFields.children = "children";
+
+
+var level0SeriesTemplate = new am4plugins_sunburst.SunburstSeries();
+level0SeriesTemplate.hiddenInLegend = false;
+sunburstChart.seriesTemplates.setKey("0", level0SeriesTemplate)
+
+// this makes labels to be hidden if they don't fit
+level0SeriesTemplate.labels.template.truncate = true;
+level0SeriesTemplate.labels.template.hideOversized = true;
+
+level0SeriesTemplate.labels.template.adapter.add("rotation", function(rotation, target) {
+  target.maxWidth = target.dataItem.slice.radius - target.dataItem.slice.innerRadius - 10;
+  target.maxHeight = Math.abs(target.dataItem.slice.arc * (target.dataItem.slice.innerRadius + target.dataItem.slice.radius) / 2 * am4core.math.RADIANS);
+
+  return rotation;
+})
+
+
+var level1SeriesTemplate = level0SeriesTemplate.clone();
+sunburstChart.seriesTemplates.setKey("1", level1SeriesTemplate)
+level1SeriesTemplate.fillOpacity = 0.75;
+level1SeriesTemplate.hiddenInLegend = true;
+
+var level2SeriesTemplate = level0SeriesTemplate.clone();
+sunburstChart.seriesTemplates.setKey("2", level2SeriesTemplate)
+level2SeriesTemplate.fillOpacity = 0.5;
+level2SeriesTemplate.hiddenInLegend = true;
+
+sunburstChart.legend = new am4charts.Legend();
+
+}); // end am4core.ready()
+</script>
+
+<!-- HTML -->
+<div id="sunburstChart"></div>
+</html>
